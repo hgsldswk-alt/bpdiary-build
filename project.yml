@@ -1,0 +1,131 @@
+name: BPDiary
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: zh-Hans
+  knownRegions: [zh-Hans, en, zh-Hant]
+settings:
+  base:
+    APP_ID: com.hgsldswk.bpdiary
+    APP_STORE_ID: "6835021169"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+targets:
+  BPDiary:
+    type: application
+    platform: iOS
+    sources:
+      - BPDiary
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID)
+        TARGETED_DEVICE_FAMILY: "1"  # XcodeGen 默认 1,2 会盖掉项目级设置，必须写在 target 上
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: BPDiary AppStore
+    info:
+      path: BPDiary/Info.plist
+      properties:
+        CFBundleDisplayName: 血压记录本
+        CFBundleDevelopmentRegion: zh-Hans
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        CFBundleURLTypes:
+          - CFBundleURLName: $(APP_ID)
+            CFBundleURLSchemes: [bpdiary]
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+        BPDiaryAppGroup: group.$(APP_ID)
+        BPDiaryProProductID: $(APP_ID).pro
+        BPDiaryTrialProductID: $(APP_ID).trial
+        APP_STORE_ID: $(APP_STORE_ID)
+        NSHealthShareUsageDescription: 读取本机主人的健康记录。
+        NSHealthUpdateUsageDescription: 保存本机主人的健康记录。
+        NSFaceIDUsageDescription: 保护您的本地健康记录。
+    entitlements:
+      path: BPDiary/BPDiary.entitlements
+      properties:
+        com.apple.security.application-groups: [group.$(APP_ID)]
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+    dependencies:
+      - target: BPDiaryWidget
+  BPDiaryWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - BPDiaryWidget
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).widget
+        TARGETED_DEVICE_FAMILY: "1"  # XcodeGen 默认 1,2 会盖掉项目级设置，必须写在 target 上
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: BPDiary Widget AppStore
+    info:
+      path: BPDiaryWidget/Info.plist
+      properties:
+        CFBundleDisplayName: 血压记录本
+        CFBundleDevelopmentRegion: zh-Hans
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        BPDiaryAppGroup: group.$(APP_ID)
+    entitlements:
+      path: BPDiaryWidget/BPDiaryWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.$(APP_ID)]
+  BPDiaryTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - BPDiaryTests
+      - Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).tests
+        GENERATE_INFOPLIST_FILE: YES
+  BPDiaryUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - BPDiaryUITests
+    dependencies:
+      - target: BPDiary
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: BPDiary
+schemes:
+  BPDiary:
+    build:
+      targets:
+        BPDiary: all
+        BPDiaryTests: [test]
+    test:
+      config: Debug
+      targets: [BPDiaryTests]
+  BPDiaryUI:
+    build:
+      targets:
+        BPDiary: all
+        BPDiaryUITests: [test]
+    test:
+      config: Debug
+      targets: [BPDiaryUITests]
